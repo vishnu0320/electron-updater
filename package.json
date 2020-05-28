@@ -1,13 +1,13 @@
 {
   "name": "electron-app",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
     "build": "electron-builder build --win --publish never",
-    "deploy": "electron-builder build --win --publish always" 
+    "deploy": "electron-builder build --win --publish always"
   },
   "author": "",
   "license": "ISC",
@@ -16,11 +16,11 @@
     "electron-builder": "^22.7.0"
   },
   "dependencies": {
+    "electron-log": "^4.2.0",
     "electron-updater": "^4.3.1"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/vishnu0320/electron-updater.git"
+    "type": "git",
+    "url": "https://github.com/vishnu0320/electron-updater.git"
   }
-  
 }

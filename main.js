@@ -1,7 +1,45 @@
-const { app, BrowserWindow, ipcMain,dialog } = require('electron');
+const { app, BrowserWindow,Menu, ipcMain,dialog } = require('electron');
 const { autoUpdater } = require('electron-updater');
+const log = require('electron-log');
+
+
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
+log.info('App starting...');
+
+//-------------------
+
+let template = []
+if (process.platform === 'darwin') {
+  // OS X
+  const name = app.getName();
+  template.unshift({
+    label: name,
+    submenu: [
+      {
+        label: 'About ' + name,
+        role: 'about'
+      },
+      {
+        label: 'Quit',
+        accelerator: 'Command+Q',
+        click() { app.quit(); }
+      },
+    ]
+  })
+}
+//---------------------------
+
+//let win;
+
 
 let mainWindow;
+
+
+  function sendStatusToWindow(text) {
+    log.info(text);
+    mainWindow.webContents.send('message', text);
+  }
 
 function createWindow () {
   mainWindow = new BrowserWindow({
@@ -11,22 +49,45 @@ function createWindow () {
       nodeIntegration: true,
     },
   });
-  mainWindow.loadFile('index.html');
+  mainWindow.webContents.openDevTools();
+  // mainWindow.loadFile('index.html');
   mainWindow.on('closed', function () {
     mainWindow = null;
   });
-  //check update after open app
-  mainWindow.once('ready-to-show', () => {
-    autoUpdater.checkForUpdatesAndNotify();
-  });
+  mainWindow.loadURL(`file://${__dirname}/version.html#v${app.getVersion()}`);
+  return mainWindow;
 }
-autoUpdater.on('checking-for-update', function () {
-  dialog.showMessageBox({
-    message: "error",
-  });
-});
 
+
+//   //check update after open app
+//   mainWindow.once('ready-to-show', () => {
+//     autoUpdater.checkForUpdatesAndNotify();
+//   });
+// }
+autoUpdater.on('checking-for-update', () => {
+  sendStatusToWindow('Checking for update...');
+})
+autoUpdater.on('update-available', (info) => {
+  sendStatusToWindow('Update available.');
+})
+autoUpdater.on('update-not-available', (info) => {
+  sendStatusToWindow('Update not available.');
+})
+autoUpdater.on('error', (err) => {
+  sendStatusToWindow('Error in auto-updater. ' + err);
+})
+autoUpdater.on('download-progress', (progressObj) => {
+  let log_message = "Download speed: " + progressObj.bytesPerSecond;
+  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+  sendStatusToWindow(log_message);
+})
+autoUpdater.on('update-downloaded', (info) => {
+  sendStatusToWindow('Update downloaded');
+});
 app.on('ready', () => {
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
   createWindow();
 });
 
@@ -35,25 +96,20 @@ app.on('window-all-closed', function () {
     app.quit();
   }
 });
-
-app.on('activate', function () {
-  if (mainWindow === null) {
-    createWindow();
-  }
+app.on('ready', function()  {
+  autoUpdater.checkForUpdatesAndNotify();
 });
 
-ipcMain.on('app_version', (event) => {
-  event.sender.send('app_version', { version: app.getVersion() });
-});
-//auto update code
-autoUpdater.on('update-available', () => {
-  mainWindow.webContents.send('update_available');
-});
-autoUpdater.on('update-downloaded', () => {
-  mainWindow.webContents.send('update_downloaded');
-});
+// app.on('activate', function () {
+//   if (mainWindow === null) {
+//     createWindow();
+//   }
+// });
 
-ipcMain.on('restart_app', () => {
-  autoUpdater.quitAndInstall();
-});
+// ipcMain.on('app_version', (event) => {
+//   event.sender.send('app_version', { version: app.getVersion() });
+// });
 
+// ipcMain.on('restart_app', () => {
+//   autoUpdater.quitAndInstall();
+// });
