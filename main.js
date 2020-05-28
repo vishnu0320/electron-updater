@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain,dialog } = require('electron');
 const { autoUpdater } = require('electron-updater');
 
 let mainWindow;
@@ -14,6 +14,11 @@ function createWindow () {
   mainWindow.loadFile('index.html');
   mainWindow.on('closed', function () {
     mainWindow = null;
+  });
+  autoUpdater.on('checking-for-update', function () {
+    dialog.showMessageBox({
+      message: "error",
+    });
   });
   //check update after open app
   mainWindow.once('ready-to-show', () => {
@@ -41,13 +46,14 @@ ipcMain.on('app_version', (event) => {
   event.sender.send('app_version', { version: app.getVersion() });
 });
 //auto update code
-autoUpdater.on('update_available', () => {
+autoUpdater.on('update-available', () => {
   mainWindow.webContents.send('update_available');
 });
-autoUpdater.on('update_downloaded', () => {
+autoUpdater.on('update-downloaded', () => {
   mainWindow.webContents.send('update_downloaded');
 });
 
 ipcMain.on('restart_app', () => {
   autoUpdater.quitAndInstall();
 });
+
