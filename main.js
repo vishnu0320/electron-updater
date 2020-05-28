@@ -41,10 +41,10 @@ ipcMain.on('app_version', (event) => {
   event.sender.send('app_version', { version: app.getVersion() });
 });
 //auto update code
-autoUpdater.on('update-available', () => {
+autoUpdater.on('update_available', () => {
   mainWindow.webContents.send('update_available');
 });
-autoUpdater.on('update-downloaded', () => {
+autoUpdater.on('update_downloaded', () => {
   mainWindow.webContents.send('update_downloaded');
 });
 
