@@ -15,16 +15,16 @@ function createWindow () {
   mainWindow.on('closed', function () {
     mainWindow = null;
   });
-  autoUpdater.on('checking-for-update', function () {
-    dialog.showMessageBox({
-      message: "error",
-    });
-  });
   //check update after open app
   mainWindow.once('ready-to-show', () => {
     autoUpdater.checkForUpdatesAndNotify();
   });
 }
+autoUpdater.on('checking-for-update', function () {
+  dialog.showMessageBox({
+    message: "error",
+  });
+});
 
 app.on('ready', () => {
   createWindow();
