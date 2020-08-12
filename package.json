@@ -1,6 +1,6 @@
 {
   "name": "electron-app",
-  "version": "1.2.0-SL",
+  "version": "1.0.0-SL",
   "description": "",
   "main": "main.js",
   "scripts": {
@@ -22,5 +22,12 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/vishnu0320/electron-updater.git"
+  },
+  "build": {
+    "appId": "com.example.ElectronAutoUpdate",
+    "publish": {
+      "provider": "github",
+      "token": "fa61ede593a88347b2c2a5a6a7a55d337acdbd6f"
+    }
   }
 }
